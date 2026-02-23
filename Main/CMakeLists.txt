@@ -4,4 +4,6 @@ project(PBL C)
 set(CMAKE_C_STANDARD 11)
 
 add_executable(PBL
-        main.c)
+    Main/main.c
+    Algoritmi/radix.c
+)
