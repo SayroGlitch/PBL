@@ -1,6 +1,6 @@
 #include "stdio.h"
 #include "stdlib.h"
-#import "../timsort_Bujdan.c"
+#include "../timsort_Bujdan.c"
 #include "time.h"
 
 int main() {
