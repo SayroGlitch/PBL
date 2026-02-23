@@ -1,4 +1,4 @@
-#include "radix.h"
+#include "radix_sort.h"
 #include <stdlib.h>
 //facem apel cu radixSort(arr, N);
 void radixSort(int arr[], int n) {

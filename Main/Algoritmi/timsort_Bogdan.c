@@ -15,7 +15,7 @@ void insertionSort(int arr[], int left, int right) {
 }
 
 // Merge function
-void merge(int arr[], int l, int m, int r) {
+void merge_second(int arr[], int l, int m, int r) {
     int len1 = m - l + 1;
     int len2 = r - m;
 
@@ -63,7 +63,7 @@ void timSort(int arr[], int n) {
                         left + 2 * size - 1 : n - 1;
 
             if (mid < right)
-                merge(arr, left, mid, right);
+                merge_second(arr, left, mid, right);
         }
     }
 }

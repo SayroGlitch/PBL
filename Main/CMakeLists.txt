@@ -5,5 +5,9 @@ set(CMAKE_C_STANDARD 11)
 
 add_executable(PBL
     Main/main.c
-    Algoritmi/radix.c
+    Algoritmi/radix_sort.c
+    Algoritmi/merge_sort.c
+    Algoritmi/quick_sort.c
+    Algoritmi/selection_sort.c
+    Algoritmi/timsort_Bogdan.c
 )
