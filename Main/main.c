@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
+#include <sys/resource.h>
 
 // TimSort
 #include "Algoritmi/timsort_Bogdan.h"
@@ -37,7 +38,7 @@ int main() {
     int optiune, n_elemente, tip_ordine, output_dest;
     char filename[150], ordine_str[20];
     struct timespec start, end;
-
+    struct rusage usage;//pentru masurare
     while (1) {
         afiseaza_meniu();
         if (scanf("%d", &optiune) != 1 || optiune == 0) break;
@@ -93,6 +94,8 @@ int main() {
 
         //vedem timpul final
         timespec_get(&end, TIME_UTC);
+        getrusage(RUSAGE_SELF, &usage);//masuram timpul
+        
 
         // diferenta de secunde
         long long nanosecunde = (long long)(end.tv_sec - start.tv_sec) * 1000000000LL + (end.tv_nsec - start.tv_nsec);
@@ -113,9 +116,9 @@ int main() {
             printf("\n");
         }
 
-        printf("\n>>> Time of execution : %lld nanosec <<<\n", nanosecunde);
-        printf(">>> Approximate: %.6f milisec <<<\n", (double)nanosecunde / 1000000.0);
-
+        printf("\n# Time of execution : %lld nanosec \n", nanosecunde);
+        printf("# Approximate: %.6f milisec \n", (double)nanosecunde / 1000000.0);
+        printf("# Memory Peak: %ld KB \n", usage.ru_maxrss / 1024);
         free(arr); //eliberam memoria noastra
     }
 
