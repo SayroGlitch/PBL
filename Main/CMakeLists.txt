@@ -4,7 +4,7 @@ project(PBL C)
 set(CMAKE_C_STANDARD 11)
 
 add_executable(PBL
-    Main/main.c
+    main.c
     Algoritmi/radix_sort.c
     Algoritmi/merge_sort.c
     Algoritmi/quick_sort.c

@@ -1,27 +1,21 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
-#include <time.h>
-#include <sys/resource.h>
+#include <windows.h>
+#include <ctype.h>
 
 // TimSort
 #include "Algoritmi/timsort_Bogdan.h"
-#include "Algoritmi/timsort_Bogdan.c"
 // Radix Sort
-#include "Algoritmi/radix_sort.c"
 #include "Algoritmi/radix_sort.h"
 // Quick Sort (temporar)
-#include "Algoritmi/quick_sort.c"
 #include "Algoritmi/quick_sort.h"
 // Selection Sort (temporar)
-#include "Algoritmi/selection_sort.c"
 #include "Algoritmi/selection_sort.h"
 // Merge Sort (temporar)
-#include "Algoritmi/merge_sort.c"
 #include "Algoritmi/merge_sort.h"
 
+#define WIN32_LEAN_AND_MEAN
 
 void afiseaza_meniu() {
     printf("\nSELECT ALGORITM:\n");
@@ -34,11 +28,16 @@ void afiseaza_meniu() {
     printf("You've selected : ");
 }
 
-int main() {
+int standart_case() {
+    printf("You can also start the program by using arguments.\nYou must use 4 arguments:\n"
+           "1.Algorithm(1-5)\n"
+           "2.Number of elements:{100, 1000, 10000, 100000, 1000000}\n"
+           "3.Initial array order:1.ascendent, 2.descendent, 3.random\n"
+           "4.Output:1.Console, 2.File");
     int optiune, n_elemente, tip_ordine, output_dest;
     char filename[150], ordine_str[20];
-    struct timespec start, end;
-    struct rusage usage;//pentru masurare
+    LARGE_INTEGER frequency, start, end,out_end;
+
     while (1) {
         afiseaza_meniu();
         if (scanf("%d", &optiune) != 1 || optiune == 0) break;
@@ -57,11 +56,11 @@ int main() {
         }
 
         // concatenam calea la fisierul meu
-        sprintf(filename, "inputs/input_%d_%s.txt", n_elemente, ordine_str);
+        sprintf(filename, "../inputs/input_%d_%s.txt", n_elemente, ordine_str);
 
         FILE *fin = fopen(filename, "r");
         if (!fin) {
-            printf(" Eroare: We can't find file %s.Check inputs folder \n", filename);
+            printf(" Eroare: We can't find file %s\nCheck inputs folder\n", filename);
             continue;
         }
 
@@ -81,10 +80,11 @@ int main() {
         printf("We sort:\n");
 
         //masuram in nanosec
-        timespec_get(&start, TIME_UTC);
+        QueryPerformanceFrequency(&frequency);
+        QueryPerformanceCounter(&start);
 
         switch (optiune) {
-            case 1: timSort(arr, n_elemente); break; 
+            case 1: timSort(arr, n_elemente); break;
             case 2: radixSort(arr, n_elemente); break;
             case 3: quickSort(arr, 0, n_elemente - 1); break;
             case 4: selectionSort(arr, n_elemente); break;
@@ -93,22 +93,21 @@ int main() {
         }
 
         //vedem timpul final
-        timespec_get(&end, TIME_UTC);
-        getrusage(RUSAGE_SELF, &usage);//masuram timpul
-        
+        QueryPerformanceCounter(&end);
 
-        // diferenta de secunde
-        long long nanosecunde = (long long)(end.tv_sec - start.tv_sec) * 1000000000LL + (end.tv_nsec - start.tv_nsec);
+        double time = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
 
         printf("Where do you want to save results? (1. Screen, 2. out.txt): ");
         scanf("%d", &output_dest);
 
-        if (output_dest == 2) {
-            FILE *fout = fopen("out.txt", "a");
+        if(output_dest == 2) {
+            FILE *fout = fopen("../results/out.txt", "a");
             if (fout) {
                 for (int i = 0; i < n_elemente; i++) fprintf(fout, "%d ", arr[i]);
+                QueryPerformanceCounter(&end);
+                double out_time = time + (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
                 fclose(fout);
-                printf("Success! Check file out.txt.\n");
+                printf("Success! Check file out.txt.\nSorting + File Output time:%.6f seconds\n",out_time);
             }
         } else {
             printf("\nSorted vector is:\n");
@@ -116,12 +115,130 @@ int main() {
             printf("\n");
         }
 
-        printf("\n# Time of execution : %lld nanosec \n", nanosecunde);
-        printf("# Approximate: %.6f milisec \n", (double)nanosecunde / 1000000.0);
-        printf("# Memory Peak: %ld KB \n", usage.ru_maxrss / 1024);
+        printf("Execution time: %.6f seconds\n", time);
+        // printf("# Memory Peak: %ld KB \n", usage.ru_maxrss / 1024);
         free(arr); //eliberam memoria noastra
     }
+    return 0;
+}
 
-    printf("\n");
+int argument_case(int n, char *arg[]) {
+    char filename[150], ordine_str[20];
+    LARGE_INTEGER frequency, start, end;
+
+    char *endptr;
+    long optiune = strtol(arg[1], &endptr, 10);
+
+    if(*endptr != '\0') {
+        printf("Invalid number: %s\n", arg[1]);
+        return 1;
+    }
+    endptr = "";
+    long n_elemente = strtol(arg[2], &endptr, 10);
+
+    if(*endptr != '\0') {
+        printf("Invalid number: %s\n", arg[2]);
+        return 1;
+    }
+    endptr = "";
+
+    long tip_ordine = strtol(arg[3], &endptr, 10);
+
+    if(*endptr != '\0') {
+        printf("Invalid number: %s\n", arg[3]);
+        return 1;
+    }
+    endptr = "";
+
+    long output_dest = strtol(arg[4], &endptr, 10);
+
+    if(*endptr != '\0') {
+        printf("Invalid number: %s\n", arg[4]);
+        return 1;
+    }
+    endptr = "";
+
+    switch(tip_ordine) {
+        case 1: strcpy(ordine_str, "ascendent"); break;
+        case 2: strcpy(ordine_str, "descendent"); break;
+        default: strcpy(ordine_str, "random"); break;
+    }
+
+    // concatenam calea la fisierul meu
+    sprintf(filename, "PBL/Main/inputs/input_%ld_%s.txt", n_elemente, ordine_str);
+
+    FILE *fin = fopen(filename, "r");
+    if (!fin) {
+        printf(" Eroare: We can't find file %s\nCheck inputs folder\n", filename);
+    }
+
+    // alocarea dinamica
+    int *arr = malloc(n_elemente * sizeof(int));
+    if (!arr) {
+        printf(" Error: No memory !\n");
+        fclose(fin);
+    }
+
+    for (int i = 0; i < n_elemente; i++) {
+        if (fscanf(fin, "%d", &arr[i]) == EOF) break;
+    }
+    fclose(fin);
+
+    printf("We sort:\n");
+
+        //masuram in sec
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&start);
+
+    switch (optiune) {
+        case 1: timSort(arr, n_elemente); break;
+        case 2: radixSort(arr, n_elemente); break;
+        case 3: quickSort(arr, 0, n_elemente - 1); break;
+        case 4: selectionSort(arr, n_elemente); break;
+        case 5: mergeSort(arr, 0, n_elemente - 1); break;
+        default: printf("Invalid variant!\n"); break;
+    }
+
+    //vedem timpul final
+    QueryPerformanceCounter(&end);
+
+    //calculam timpul de lucru al algoritmului in secunde
+    double time = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+
+    if (output_dest == 2) {
+        FILE *fout = fopen("PBL/Main/results/out.txt", "a");
+        if (fout) {
+            for (int i = 0; i < n_elemente; i++) fprintf(fout, "%d ", arr[i]);
+            QueryPerformanceCounter(&end);
+            double out_time = time + (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+            fclose(fout);
+            printf("Success! Check file out.txt.\nSorting + File Output time:%.6f seconds\n",out_time);
+        }
+    } else {
+        printf("\nSorted vector is:\n");
+        for (int i = 0; i < n_elemente; i++) printf("%d ", arr[i]);
+        printf("\n");
+    }
+
+    printf("Execution time: %.6f seconds\n", time);
+    // printf("# Memory Peak: %ld KB \n", usage.ru_maxrss / 1024);
+    free(arr); //eliberam memoria noastra
+
+    return 0;
+}
+
+
+int main(int argc, char *argv[]) {
+    char delete;
+    if(argc == 1) standart_case();
+    else argument_case(argc,argv);
+
+    if (strcmp(argv[4],"2") || argc == 1) {
+        printf("\nDo you want to delete the output file?(y/n): ");
+
+        scanf(" %c",&delete);
+        if(tolower(delete) == 'y') remove("../results/out.txt");
+    }
+
     return 0;
 }
