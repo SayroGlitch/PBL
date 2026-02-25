@@ -1,0 +1,5 @@
+Main:
+gcc -std=c11 -Wall -Wextra PBL/Main/main.c PBL/Main/Algoritmi/timsort_Bogdan.c PBL/Main/Algoritmi/radix_sort.c PBL/Main/Algoritmi/quick_sort.c PBL/Main/Algoritmi/selection_sort.c PBL/Main/Algoritmi/merge_sort.c -o main.exe
+
+Terminal:
+gcc -std=c11 -Wall -Wextra PBL/Main/terminal.c PBL/Main/Algoritmi/timsort_Bogdan.c PBL/Main/Algoritmi/radix_sort.c PBL/Main/Algoritmi/quick_sort.c PBL/Main/Algoritmi/selection_sort.c PBL/Main/Algoritmi/merge_sort.c -o program.exe

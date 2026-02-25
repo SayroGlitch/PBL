@@ -10,4 +10,5 @@ add_executable(PBL
     Algoritmi/quick_sort.c
     Algoritmi/selection_sort.c
     Algoritmi/timsort_Bogdan.c
+        terminal.c
 )
