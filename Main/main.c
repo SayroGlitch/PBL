@@ -57,7 +57,7 @@ int standart_case() {
         }
 
         // concatenam calea la fisierul meu
-        sprintf(filename, "../inputs/input_%d_%s.txt", n_elemente, ordine_str);
+        sprintf(filename, "inputs/input_%d_%s.txt", n_elemente, ordine_str);
 
         FILE *fin = fopen(filename, "r");
         if (!fin) {
@@ -66,7 +66,7 @@ int standart_case() {
         }
 
         // alocarea dinamica
-        int *arr = (int*)malloc(n_elemente * sizeof(int));
+        int *arr = malloc(n_elemente * sizeof(int));
         if (!arr) {
             printf(" Error: No memory !\n");
             fclose(fin);
@@ -102,7 +102,7 @@ int standart_case() {
         scanf("%d", &output_dest);
 
         if(output_dest == 2) {
-            FILE *fout = fopen("../results/out.txt", "a");
+            FILE *fout = fopen("results/out.txt", "a");
             if (fout) {
                 for (int i = 0; i < n_elemente; i++) fprintf(fout, "%d ", arr[i]);
                 QueryPerformanceCounter(&end);
@@ -171,7 +171,7 @@ int argument_case(char *arg[]) {
     }
 
     // concatenam calea la fisierul meu
-    sprintf(filename, "../inputs/input_%ld_%s.txt", n_elemente, ordine_str);
+    sprintf(filename, "inputs/input_%ld_%s.txt", n_elemente, ordine_str);
 
     FILE *fin = fopen(filename, "r");
     if (!fin) {
@@ -212,7 +212,7 @@ int argument_case(char *arg[]) {
     double time = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
 
     if (output_dest == 2) {
-        FILE *fout = fopen("../results/out.txt", "a");
+        FILE *fout = fopen("results/out.txt", "a");
         if (fout) {
             for (int i = 0; i < n_elemente; i++) fprintf(fout, "%d ", arr[i]);
             QueryPerformanceCounter(&end);
@@ -237,19 +237,8 @@ int argument_case(char *arg[]) {
     return 0;
 }
 
-
 int main(int argc, char *argv[]) {
-    char delete;
     if(argc == 1) standart_case();
     else argument_case(argv);
-
-    FILE *fout = fopen("../results/out.txt", "r");
-    if(fout) {
-        printf("\nDo you want to delete the output file?(y/n): ");
-
-        scanf(" %c",&delete);
-        if(tolower(delete) == 'y') remove("../results/out.txt");
-    }
-    fclose(fout);
     return 0;
 }
