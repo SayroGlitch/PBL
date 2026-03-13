@@ -1,0 +1,4 @@
+maxflow % for f in best1_direct best2_parallel avg1_random_medium avg2_layered_random worst1_dense_backflow worst2_maxdense outlier1_disconnected outlier2_bottleneck1 outlier3_star outlier4_longchain; do
+    echo -e "\n--- $f ---"
+    ./maximka < "$f.txt"
+done
