@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flux Maxim cu Algoritmi Multipli</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <h1>Flux Maxim cu Algoritmi Multipli</h1>
+            <p class="subtitle">Vizualizare interactivă pentru mai mulți algoritmi de maximum flow în rețele</p>
+        </header>
+
+        <!-- MODE TABS -->
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="learn">Mod Învățare</button>
+            <button class="mode-tab" data-mode="free">Simulare Liberă</button>
+        </div>
+
+        <!-- LEARN MODE -->
+        <div class="mode-panel active" id="learn-mode">
+            <h2>Mod Învățare - Exemple Fixe</h2>
+            <div class="examples-grid">
+                <button class="example-btn" data-example="simple">Exemplu Simplu (4 noduri)</button>
+                <button class="example-btn" data-example="medium">Exemplu Mediu (6 noduri)</button>
+                <button class="example-btn" data-example="complex">Exemplu Complex (8 noduri)</button>
+            </div>
+        </div>
+
+        <!-- FREE MODE -->
+        <div class="mode-panel" id="free-mode">
+            <h2>Simulare Liberă</h2>
+            <div class="controls-grid">
+                <div>
+                    <label for="num-vertices">Număr de noduri:</label>
+                    <input type="number" id="num-vertices" min="2" max="25" value="6" class="input-field">
+                </div>
+                <div>
+                    <label for="random-edges">Muchii random</label>
+                    <label class="toggle-field" for="random-edges">
+                        <input type="checkbox" id="random-edges" class="checkbox-field" checked>
+                        <span class="toggle-slider" aria-hidden="true"></span>
+                        <span class="toggle-text">Activează muchii generate automat</span>
+                    </label>
+                </div>
+                <button class="btn-primary" id="generate-graph">Generează Rețea</button>
+            </div>
+        </div>
+
+        <!-- SIMULATOR AREA -->
+        <section class="simulator-section">
+            <div class="simulator-main">
+                <!-- REȚEA GRAFIC -->
+                <div class="canvas-container">
+                    <h3>Rețea Flux</h3>
+                    <canvas id="graph-canvas" width="900" height="550" aria-label="Vizualizare rețea de flux"></canvas>
+                    <div class="legend">
+                        <span class="legend-item"><span class="legend-color" style="background: #52c7a5;"></span> Nod Sursă</span>
+                        <span class="legend-item"><span class="legend-color" style="background: #f2a65a;"></span> Nod Scurgere</span>
+                        <span class="legend-item"><span class="legend-color" style="background: #69c48d;"></span> Muchie: Flux &gt; 0</span>
+                        <span class="legend-item"><span class="legend-color" style="background: #d6c15a;"></span> Muchie Activă</span>
+                        <span class="legend-item"><span class="legend-color" style="background: #d96b6b;"></span> Muchie Saturată</span>
+                    </div>
+                </div>
+
+                <!-- PANOU EXPLICAȚII -->
+                <div class="explanation-panel">
+                    <h3>Pas Curent</h3>
+                    <div class="explanation-content">
+                        <div class="explanation-item">
+                            <span class="explanation-label">Fază:</span>
+                            <span id="current-phase" class="explanation-value">Așteptare inițializare...</span>
+                        </div>
+                        <div class="explanation-item" id="traversal-count-item">
+                            <span class="explanation-label" id="traversal-count-label">BFS Nr:</span>
+                            <span id="bfs-count" class="explanation-value">0</span>
+                        </div>
+                        <div class="explanation-item">
+                            <span class="explanation-label">Nod Curent:</span>
+                            <span id="current-node" class="explanation-value">—</span>
+                        </div>
+                        <div class="explanation-item">
+                            <span class="explanation-label">Muchie Explorată:</span>
+                            <span id="current-edge" class="explanation-value">—</span>
+                        </div>
+                        <div class="explanation-item">
+                            <span class="explanation-label">Bottleneck:</span>
+                            <span id="bottleneck" class="explanation-value">—</span>
+                        </div>
+                        <div class="explanation-item">
+                            <span class="explanation-label">Flux Total:</span>
+                            <span id="total-flow" class="explanation-value">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="narrative-box">
+                        <p id="narrative-text">Apasă Start pentru a începe.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTROALE SIMULATOR -->
+            <section class="simulator-controls">
+                <div class="control-buttons">
+                    <button class="btn-primary" id="btn-start">Start</button>
+                    <button class="btn-secondary" id="btn-next">Pas Următor</button>
+                    <button class="btn-secondary" id="btn-pause">Pauză</button>
+                    <button class="btn-secondary" id="btn-reset">Reset</button>
+                </div>
+                <div class="simulator-tools">
+                    <div class="algorithm-control">
+                        <label for="algorithm-select">Algoritm:</label>
+                        <select id="algorithm-select" class="input-field">
+                            <option value="ford-fulkerson">Ford-Fulkerson</option>
+                            <option value="dinic" selected>Dinic</option>
+                            <option value="edmonds-karp">Edmonds-Karp</option>
+                            <option value="push-relabel">Push-Relabel</option>
+                            <option value="capacity-scaling">Capacity Scaling</option>
+                        </select>
+                    </div>
+                    <div class="speed-control">
+                    <label for="speed-slider">Viteză Animație:</label>
+                    <input type="range" id="speed-slider" min="0.2" max="2" step="0.1" value="1" class="slider">
+                    <span id="speed-value">1.0x</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BFS LAYERS VISUALIZATION -->
+            <div class="bfs-container" id="traversal-container">
+                <h3 id="traversal-title">Straturi BFS (Level Graph)</h3>
+                <canvas id="bfs-canvas" width="1200" height="300" aria-label="Vizualizare straturi BFS"></canvas>
+            </div>
+
+            <!-- MUCHII TABLE -->
+            <div class="edges-table-container">
+                <h3>Tabel Muchii</h3>
+                <table id="edges-table" class="edges-table">
+                    <thead>
+                        <tr>
+                            <th>Muchie</th>
+                            <th>Capacitate</th>
+                            <th>Flux</th>
+                            <th>Capacitate Reziduală</th>
+                            <th>Stare</th>
+                        </tr>
+                    </thead>
+                    <tbody id="edges-tbody">
+                        <tr><td colspan="5" style="text-align: center; color: #999;">Generați o rețea pentru a vedea muchiile</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- STATISTICI FINALE -->
+        <section class="statistics-section" id="statistics-section" style="display: none;">
+            <h2>Statistici Finale</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-flux">0</div>
+                    <div class="stat-label">Flux Maxim Calculat</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-bfs-count">0</div>
+                    <div class="stat-label">Iterații BFS</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-saturated">0</div>
+                    <div class="stat-label">Muchii Saturate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-density">0%</div>
+                    <div class="stat-label">Densitate Rețea</div>
+                </div>
+            </div>
+            <div class="conclusion-box">
+                <p id="conclusion-text"></p>
+            </div>
+        </section>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

@@ -22,7 +22,7 @@ size_t get_memory_kb() {
 double get_time_us() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    return ts.tv_sec * 1000000.0 + ts.tv_nsec / 1000.0;
+    return ts.tv_sec * 1000.0 + ts.tv_nsec / 1000000.0;
 }
 size_t get_memory_kb() {
     struct rusage r;
@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
 
     printf("Max Flow     : %lld\n",    result);
     printf("Time         : %.5f ms\n", t1 - t0);
-    printf("Memory       : %zu KB\n",  mem_kb);
+    printf("Memory       : %zu KB\n",  mem_kb/1024);
     printf("Edges (arcs) : %d\n",      edge_cnt);
     return 0;
 }

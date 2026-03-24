@@ -1,0 +1,10 @@
+{
+  "defaultVertices": 6,
+  "defaultCapacityTarget": 20,
+  "minVertices": 2,
+  "maxVertices": 20,
+  "randomFlowMin": 8,
+  "randomFlowMax": 30,
+  "targetMin": 1,
+  "targetMax": 100
+}
